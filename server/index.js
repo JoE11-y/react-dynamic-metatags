@@ -4,6 +4,8 @@ const path = require("path");
 const fs = require("fs");
 const { getPostById } = require("./stub/posts");
 const PORT = process.env.PORT || 3000;
+const base = process.env.BASE || '/'
+const axios = require("axios");
 
 // static resources should just be served as they are
 app.use(
@@ -19,23 +21,27 @@ app.listen(PORT, (error) => {
 
 const indexPath = path.resolve(__dirname, "..", "build", "index.html");
 app.get("/*", (req, res, next) => {
-  fs.readFile(indexPath, "utf8", (err, htmlData) => {
+  
+  fs.readFile(indexPath, "utf8", async (err, htmlData) => {
     if (err) {
       console.error("Error during file reading", err);
       return res.status(404).end();
     }
-    // get post info
-    const postId = req.query.id;
-    const post = getPostById(postId);
-    if (!post) return res.status(404).send("Post not found");
 
-    // inject meta tags
-    htmlData = htmlData
-      .replace("<title>React App</title>", `<title>${post.title}</title>`)
-      .replace("__META_OG_TITLE__", post.title)
-      .replace("__META_OG_DESCRIPTION__", post.description)
-      .replace("__META_DESCRIPTION__", post.description)
-      .replace("__META_OG_IMAGE__", post.thumbnail);
+    const url = req.originalUrl.replace(base, '')
+
+    if(url.includes('/') && url.split('/').length >2) {
+      const urli = url.split('/')
+      const index = urli[2]
+      const meta = await axios.get(`https://bafybeifhofputngb7k3zqpl5otnv4utpvse66sbzutxsg6bkozks6ytt7m.ipfs.dweb.link/${index}`);
+      const image = `https://bafybeies3odi24wyk3e22rnautr57tiuk3b56nxrd53fxgtvr37abmz5j4.ipfs.dweb.link/${index}.png`;
+      
+      htmlData = htmlData
+      .replace("<title>Azuki|LooksRare</title>", `<title>${meta?.data.name} - Azuki|LooksRare</title>`)
+      .replace("__META_OG_TITLE__", `${meta?.data.name} - Azuki|LooksRare`)
+      .replace("__META_OG_DESCRIPTION__", `LocksRare is a Community-first Marketplace for NFT's and digital.`)
+      .replace("__META_OG_IMAGE__", image);
+    }
     return res.send(htmlData);
   });
 });
