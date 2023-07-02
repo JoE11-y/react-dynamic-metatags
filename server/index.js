@@ -40,9 +40,11 @@ app.get("/*", (req, res, next) => {
       .replace("__META_OG_TITLE__", `${meta?.data.name} - Azuki | LooksRare`)
       .replace("__META_OG_DESCRIPTION__", `LooksRare is a Community-first Marketplace for NFT's and digital.`)
       .replace("__META_OG_IMAGE__", image)
-      .replace("__META_OGT_TITLE__", `${meta?.data.name} - Azuki|LooksRare`)
+      .replace("__META_OGT_TITLE__", `${meta?.data.name} - Azuki | LooksRare`)
       .replace("__META_OGT_DESCRIPTION__", `LooksRare is a Community-first Marketplace for NFT's and digital.`)
-      .replace("__META_OGT_IMAGE__", image);
+      .replace("__META_OGT_IMAGE__", image)
+      .replace("__META_OGT_DOMAIN__", "https://looksrare.org")
+      .replace("__META_OGT_URL__", "https://looksrare.org");
     }
     return res.send(htmlData);
   });
